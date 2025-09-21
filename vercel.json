@@ -1,10 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/enviar.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/enviar", "dest": "/api/enviar.js" },
-    { "src": "/(.*)", "dest": "/public/index.html" }
-  ]
+  "functions": {
+    "api/enviar.js": {
+      "runtime": "@vercel/node"
+    }
+  }
 }
