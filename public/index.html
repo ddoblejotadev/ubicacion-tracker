@@ -11,43 +11,26 @@
     function enviarUbicacion(lat, lon) {
       console.log('Enviando ubicación:', lat, lon);
       
-      // Intentar primero con /api/enviar, luego con /api/index
-      const endpoints = ['/api/enviar', '/api/index'];
-      
-      async function tryEndpoint(endpoint) {
-        try {
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ lat, lon })
-          });
-          
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          
-          const data = await response.json();
-          console.log('Respuesta del servidor:', data);
-          document.body.innerHTML = `<h3>✅ ${data.message}</h3>`;
-          return true;
-        } catch (error) {
-          console.error(`Error con ${endpoint}:`, error);
-          return false;
+      fetch('/api/enviar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ lat, lon })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
-      }
-      
-      // Intentar endpoints en secuencia
-      endpoints.reduce(async (prev, endpoint) => {
-        const success = await prev;
-        if (!success) {
-          return await tryEndpoint(endpoint);
-        }
-        return true;
-      }, Promise.resolve(false))
-      .then(success => {
-        if (!success) {
-          document.body.innerHTML = "<h3>❌ Error al enviar la ubicación.</h3>";
-        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Respuesta del servidor:', data);
+        document.body.innerHTML = `<h3>✅ ${data.message}</h3>`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.body.innerHTML = "<h3>❌ Error al enviar la ubicación.</h3>";
       });
     }
 
