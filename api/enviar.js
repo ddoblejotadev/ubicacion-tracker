@@ -1,6 +1,15 @@
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
+  // Agregar headers CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Método no permitido' });
   }
@@ -42,9 +51,9 @@ export default async function handler(req, res) {
     console.log('Intentando enviar email a:', process.env.EMAIL_TO);
     const info = await transporter.sendMail(mailOptions);
     console.log('Email enviado exitosamente:', info.messageId);
-    res.status(200).json({ message: 'Ubicación enviada' });
+    res.status(200).json({ message: 'Ubicación enviada exitosamente' });
   } catch (error) {
     console.error('Error al enviar correo:', error);
     res.status(500).json({ message: 'Error al enviar correo', error: error.message });
   }
-}
+};
