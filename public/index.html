@@ -11,7 +11,7 @@
     function enviarUbicacion(lat, lon) {
       console.log('Enviando ubicación:', lat, lon);
       
-      fetch('/api/hello', {
+      fetch('/api/ubicacion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
