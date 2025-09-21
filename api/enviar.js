@@ -11,28 +11,40 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'Faltan coordenadas' });
   }
 
+  // Verificar que las variables de entorno estén configuradas
+  if (!process.env.SENDINBLUE_SMTP_USER || !process.env.SENDINBLUE_SMTP_PASS || !process.env.EMAIL_TO) {
+    console.error('Variables de entorno faltantes:', {
+      user: !!process.env.SENDINBLUE_SMTP_USER,
+      pass: !!process.env.SENDINBLUE_SMTP_PASS,
+      email_to: !!process.env.EMAIL_TO
+    });
+    return res.status(500).json({ message: 'Error de configuración del servidor' });
+  }
+
   const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
+    host: process.env.SENDINBLUE_SMTP_HOST || 'smtp-relay.brevo.com',
+    port: parseInt(process.env.SENDINBLUE_SMTP_PORT) || 587,
     secure: false,
     auth: {
-      user: '9780c6001@smtp-brevo.com',
-      pass: '8F6RQI3YfaLqjdUK'
+      user: process.env.SENDINBLUE_SMTP_USER,
+      pass: process.env.SENDINBLUE_SMTP_PASS
     }
   });
 
   const mailOptions = {
-    from: '9780c6001@smtp-brevo.com',
-    to: process.env.EMAIL_TO,  // configúralo en variables de entorno para seguridad
+    from: process.env.SENDINBLUE_SMTP_USER,
+    to: process.env.EMAIL_TO,
     subject: '📍 Nueva ubicación recibida',
     text: `Latitud: ${lat}\nLongitud: ${lon}\n\nVer en el mapa:\nhttps://maps.google.com/?q=${lat},${lon}`
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    console.log('Intentando enviar email a:', process.env.EMAIL_TO);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email enviado exitosamente:', info.messageId);
     res.status(200).json({ message: 'Ubicación enviada' });
   } catch (error) {
     console.error('Error al enviar correo:', error);
-    res.status(500).json({ message: 'Error al enviar correo' });
+    res.status(500).json({ message: 'Error al enviar correo', error: error.message });
   }
 }

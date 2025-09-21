@@ -9,12 +9,22 @@
 
   <script>
     function enviarUbicacion(lat, lon) {
+      console.log('Enviando ubicación:', lat, lon);
       fetch('/api/enviar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ lat, lon })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Respuesta del servidor:', data);
+        document.body.innerHTML = `<h3>✅ ${data.message}</h3>`;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.body.innerHTML = "<h3>❌ Error al enviar la ubicación.</h3>";
       });
     }
 
@@ -24,10 +34,12 @@
           position => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
+            console.log('Ubicación obtenida:', lat, lon);
             enviarUbicacion(lat, lon);
           },
           error => {
-            document.body.innerHTML = "<h3>No se pudo obtener la ubicación.</h3>";
+            console.error('Error de geolocalización:', error);
+            document.body.innerHTML = "<h3>❌ No se pudo obtener la ubicación.</h3>";
           },
           {
             enableHighAccuracy: true,
@@ -36,7 +48,7 @@
           }
         );
       } else {
-        document.body.innerHTML = "<h3>Geolocalización no soportada.</h3>";
+        document.body.innerHTML = "<h3>❌ Geolocalización no soportada.</h3>";
       }
     }
 
