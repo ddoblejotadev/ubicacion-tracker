@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/enviar.js": {
-      "runtime": "@vercel/node"
-    }
-  }
-}
