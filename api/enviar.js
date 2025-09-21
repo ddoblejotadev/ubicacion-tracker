@@ -12,16 +12,18 @@ export default async function handler(req, res) {
   }
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.EMAIL_FROM,
-      pass: process.env.EMAIL_PASS
+      user: '9780c6001@smtp-brevo.com',
+      pass: '8F6RQI3YfaLqjdUK'
     }
   });
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
-    to: process.env.EMAIL_TO,
+    from: '9780c6001@smtp-brevo.com',
+    to: process.env.EMAIL_TO,  // configúralo en variables de entorno para seguridad
     subject: '📍 Nueva ubicación recibida',
     text: `Latitud: ${lat}\nLongitud: ${lon}\n\nVer en el mapa:\nhttps://maps.google.com/?q=${lat},${lon}`
   };
